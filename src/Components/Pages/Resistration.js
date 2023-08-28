@@ -1,10 +1,12 @@
 import axios from "axios";
 import React,{useRef, useState} from "react";
+import { useHistory } from "react-router-dom/cjs/react-router-dom";
 
 
 const Resistration = () => {
     const [errorShow, setErrorShow] = useState(false);
     const [isLogIn, setIsLogIn] = useState(false);
+    const history = useHistory();
 
     const emailRef = useRef();
     const passwordRef = useRef();
@@ -14,6 +16,10 @@ const Resistration = () => {
         setIsLogIn(!isLogIn);
         setErrorShow(false);
     };
+
+    const goToForgetPassword = () => {
+        history.push('/forgetpassword');
+    }
 
     const signUpHandler = (e) => {
         e.preventDefault();
@@ -43,6 +49,43 @@ const Resistration = () => {
             }, 2000);
         }
     };
+
+    const logInHandler = (e) => {
+        e.preventDefault();
+        setErrorShow(false);
+        if (emailRef.current.value && passwordRef.current.value) {
+          localStorage.setItem("email", emailRef.current.value);
+          axios
+            .post(
+              `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDBAgN5C7TPZyHC9W05x27irF2m-Q73eOw`,
+              {
+                email: emailRef.current.value,
+                password: passwordRef.current.value,
+                returnSecureToken: true,
+              }
+            )
+            .then((res) => {
+              console.log("user has logged in successfully");
+              localStorage.setItem("token", res.data.idToken);
+              history.push("/profile");
+    
+              console.log(res.data);
+              if (res.data.displayName && res.data.profilePicture) {
+              } else {
+              }
+            })
+            .catch((error) => {
+              alert(error.response.data.error.message);
+            });
+        } else {
+          setTimeout(() => {
+            setErrorShow(false);
+          }, 3000);
+          setErrorShow(true);
+        }
+      };
+
+
 
     return (
         <div
@@ -90,6 +133,7 @@ const Resistration = () => {
                   Confirm Password
                 </label>
                 <input
+                  type="password"  
                   placeholder="Confirm Password"
                   className="form-control"
                   ref={confirmPasswordRef}
@@ -112,8 +156,18 @@ const Resistration = () => {
                 </button>
               )}
               {!isLogIn && (
-                <button className="btn btn-warning mt-3 p-2 rounded-pill fw-bold">
+                <button className="btn btn-warning mt-3 p-2 rounded-pill fw-bold"
+                onClick={logInHandler}
+                >
                   Login
+                </button>
+              )}
+              {!isLogIn && (
+                <button
+                className="btn btn-link fw-bold"
+                onClick={goToForgetPassword}
+                >
+                    Forget Password
                 </button>
               )}
             </div>
