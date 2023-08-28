@@ -1,9 +1,12 @@
 import axios from "axios";
 import React,{useRef, useState} from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
+import { useDispatch } from "react-redux";
+import { authActions } from "../Store/auth";
 
 
 const Resistration = () => {
+    const dispatch = useDispatch();
     const [errorShow, setErrorShow] = useState(false);
     const [isLogIn, setIsLogIn] = useState(false);
     const history = useHistory();
@@ -67,9 +70,9 @@ const Resistration = () => {
             .then((res) => {
               console.log("user has logged in successfully");
               localStorage.setItem("token", res.data.idToken);
-              history.push("/profile");
+              dispatch(authActions.login());
+              history.push("/");
     
-              console.log(res.data);
               if (res.data.displayName && res.data.profilePicture) {
               } else {
               }
