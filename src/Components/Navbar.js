@@ -3,6 +3,7 @@ import { useSelector,useDispatch } from "react-redux";
 import { authActions } from "./Store/auth";
 import { receivedActions } from "./Store/recieved";
 import { NavLink, useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { sentActions } from "./Store/sent";
 
 
 
@@ -14,6 +15,7 @@ const Navbar = () => {
     const logoutHandler = () => {
       history.push("/");
       dispatch(receivedActions.getReceivedMail());
+      dispatch(sentActions.getSentMail());
       dispatch(authActions.logout());
     };
     return (

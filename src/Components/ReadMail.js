@@ -19,9 +19,16 @@ const ReadMail = (props) => {
                 </div>
                 <br/>
                 <br/>
-                <h6 className="text-start py-2">
+                {props.item.receivedFrom && (
+                     <h6 className="text-start py-2">
                     From: <span>{props.item.receivedFrom}</span>
                 </h6>
+                )}
+                {props.item.to && (
+                    <h6 className="taxt-start py-2">
+                        To: <span>{props.item.to}</span>
+                    </h6>
+                )}
                 <h6 className="text-satrt py-2">
                     Subject: <span>{props.item.subject}</span>
                 </h6>
