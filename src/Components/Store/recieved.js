@@ -9,11 +9,29 @@ const receivedSlice = createSlice({
   initialState: initialReceivedState,
   reducers: {
     getReceivedMail(state, action) {
-      state.receivedMails = action.payload;
+      
+      if(!action.payload){
+        state.receivedMails =[];
+      }else {
+        state.receivedMails = [...action.payload];
+      }
+      console.log('state.receivedMails', state.receivedMails);
     },
     addEmail(state, action) {
       state.receivedMails = [...state.receivedMails, action.payload];
     },
+
+    readMail(state, action) {
+      let updatedItem = [];
+      for(let el of state.receivedMails){
+        if(el.id === action.payload.id){
+          updatedItem.push(action.payload);
+        }else {
+          updatedItem.push(el);
+        }
+      }
+      state.receivedMails = [...updatedItem];
+    }
   },
 });
 
