@@ -1,15 +1,16 @@
 import React, { useState, useRef } from "react";
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { sentActions } from './Store/sent';
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import useHttp from "./Requests/useHttp";
 
 
 
 const Compose = (props) => {
+    const {postRequest} = useHttp();
     let sentByRegex = localStorage.getItem('email').replace(/[^a-zA-Z0-9]/g, "");
 
-    const dispatch = useDispatch();
+    
     const dataRef = useRef(" ");
     const subjectRef = useRef(" ");
     const toRef = useRef(" ");
@@ -20,13 +21,18 @@ const Compose = (props) => {
 
         let toRefRgx = "";
         toRefRgx = toRef.current.value.replace(/[^a-zA-Z0-9 ]/g, "");
+
+        const quill = dataRef.current.getEditor();
+        const plainText = quill.getText();
+
+
         let bodySent = {
-            data: dataRef.current.value,
+            data: plainText,
             emailSentBy: localStorage.getItem('email'),
             to: toRef.current.value,
             subject: subjectRef.current.value,
         };
-        console.log(bodySent);
+        
 
         let bodyReceived = {
             data: dataRef.current.value,
@@ -37,35 +43,24 @@ const Compose = (props) => {
         };
         console.log(bodyReceived);
 
+        const senturl = `https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${sentByRegex}/sent.json`;
+        const receivedurl = `https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${toRefRgx}/received.json`;
 
-        axios
-            .post(`https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${sentByRegex}/sent.json`,
-                { body: bodySent }
-            )
-            .then((res) => {
-                const mail = {
-                    ...bodySent,
-                    key: res.data.name,
-                    id: res.data.name,
-                };
-                dispatch(sentActions.addEmail(mail));
-                console.log(res.data.name);
-            });
-        axios
-            .post(
-                `https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${toRefRgx}/received.json`,
-                { body: bodyReceived }
-            )
-            .then((res) => {
-                console.log(res.data.name);
-            });
+        postRequest(senturl, bodySent, "sent");
+        postRequest(receivedurl, bodyReceived);
+
+        setContent('');
+        subjectRef.current.value = '';
+        toRef.current.value = '';
+
+
     };
 
 
 
 
     return (
-        <div className="container md-8  p-4" style={{ height: "500px" }}>
+        <div className="container md-8  p-4">
             <div className="mb-3 row">
                 <label className="col-sm-1 col-form-label text-start">To</label>
                 <div className="col-sm-11">
@@ -90,17 +85,18 @@ const Compose = (props) => {
                     />
                 </div>
             </div>
-            <div className="" style={{ height: " 330px", overflow: "auto" }}>
-                <textarea
-                    rows="10"
-                    cols="135"
-                    onChange={(e) => setContent(e.target.value)}
+            <div className="">
+                <ReactQuill
+                    onChange={setContent}
                     ref={dataRef}
                     value={content}
+                    style={{
+                        height:'200px'
+                    }}
                 />
             </div>
-            <button onClick={saveData} className="btn btn-primary btn-lg ">
-                Send
+            <button onClick={saveData} className="btn btn-primary btn-lg mt-5 ">
+                Send Email
             </button>
         </div>
     );

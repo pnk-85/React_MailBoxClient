@@ -4,18 +4,17 @@ import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import { Table } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { receivedActions } from "../Store/recieved";
-import { sentActions } from "../Store/sent";
 import "./LandingPage.css";
 import Compose from "../Compose";
-import axios from "axios";
 import ReadMail from "../ReadMail";
 import { authActions } from "../Store/auth";
 import { useState, useEffect } from "react";
-
+import useHttp from "../Requests/useHttp";
 
 
 function LandingPage() {
+
+  const {getRequest, putRequest, deleteRequest} = useHttp();
 
   const auth = useSelector(state => state.auth.isAuthenticated);
   const items = useSelector((state) => state.received.receivedMails);
@@ -42,51 +41,11 @@ function LandingPage() {
     if (auth) {
       emailRegEX = localStorage.getItem('email').replace(/[^a-zA-Z0-9]/g, "");
 
-      axios.get(`https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${emailRegEX}/received.json`)
-        .then((res) => {
-          console.log('getdata', res);
-          if (res.data) {
-            const firebaseIDs = Object.keys(res.data);
-            console.log('firebaseIDs', firebaseIDs);
+            const receivedUrl = `https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${emailRegEX}/received.json`;
+            getRequest(receivedUrl, 'received');
 
-            const newItems = [];
-            Object.values(res.data).forEach((el) => {
-              console.log("el.body", el.body);
-              newItems.push({
-                ...el.body,
-                id: firebaseIDs[newItems.length],
-                key: firebaseIDs[newItems.length],
-              })
-            })
-            dispatch(receivedActions.getReceivedMail(newItems));
-            console.log("newItems", newItems);
-            console.log("object", newItems[0].data);
-          }
-        });
-
-      axios
-        .get(
-          `https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${emailRegEX}/sent.json`
-        )
-        .then((res) => {
-          console.log(" getdata", res);
-          if (res.data) {
-            const firebaseIDs = Object.keys(res.data);
-            console.log("firebaseIDs", firebaseIDs);
-            const newItems = [];
-            Object.values(res.data).forEach((el) => {
-              console.log("el.body", el.body);
-
-              newItems.push({
-                ...el.body,
-                id: firebaseIDs[newItems.length],
-                key: firebaseIDs[newItems.length],
-              });
-            });
-            console.log("newItems", newItems);
-            dispatch(sentActions.getSentMail(newItems));
-          }
-        });
+        const sentUrl = `https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${emailRegEX}/sent.json`;
+        getRequest(sentUrl);
     }
   }, [auth,counter]);
 
@@ -102,48 +61,28 @@ function LandingPage() {
 
     let toRefRgx = "";
     toRefRgx = item.myEmail.replace(/[^a-zA-Z0-9 ]/g, "");
+    const url = ` https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${toRefRgx}/received/${item.id}.json`;
 
     let bodyReceived = {
       ...item,
       read: true,
     };
 
-    axios
-      .put(
-        ` https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${toRefRgx}/received/${item.id}.json`,
-
-        { body: bodyReceived }
-      )
-      .then((res) => {
-        console.log("bodyreceived", bodyReceived);
-        dispatch(receivedActions.readMail(bodyReceived));
-      });
+    putRequest(url, bodyReceived);
   };
 
   const removeEmail = (item) => {
     let toRefRgx = "";
     toRefRgx = item.myEmail.replace(/[^a-zA-Z0-9 ]/g, "");
 
-    axios
-      .delete(
-        ` https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${toRefRgx}/received/${item.id}.json`
-      )
-      .then((res) => {
-        dispatch(receivedActions.removeEmail(item.id));
-      });
   };
 
-  const removeSentEmail = (item) => {
+  const removeSentEmail = async (item) => {
     let toRefRgx = "";
     toRefRgx = item.emailSentBy.replace(/[^a-zA-Z0-9 ]/g, "");
+    const url = ` https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${toRefRgx}/sent/${item.id}.json`;
+    await deleteRequest(url, item.id, 'sent');
 
-    axios
-      .delete(
-        ` https://mailboxproject-5ca97-default-rtdb.firebaseio.com/${toRefRgx}/sent/${item.id}.json`
-      )
-      .then((res) => {
-        dispatch(sentActions.removeEmail(item.id));
-      });
   };
 
   let count = 0;
@@ -205,7 +144,7 @@ function LandingPage() {
   let sentItems = sent.map((item) => {
     return (
       <tr className="text-dark fw-bold" key={item.key}>
-        <td className="text-dark fw-bold">
+        <td className="text-dark fw-bold " style={{width: '80px'}}>
           <input
             className="form-check-input"
             type="checkbox"
@@ -284,7 +223,7 @@ function LandingPage() {
                 <Table striped="columns">
                   <thead>
                     <tr className="fs-5 text-danger">
-                      <th className="fs-5 text-danger">
+                      <th className="fs-5 text-danger" style={{width: '80px'}}>
                         {" "}
                         <input
                           className="form-check-input"
@@ -293,6 +232,7 @@ function LandingPage() {
                           id="defaultCheck1"
                         />
                       </th>
+                      <th style={{width: '80px'}}></th>
                       <th className="fs-5 text-danger text-start">Received from</th>
                       <th className="float-start">Data</th>
                       <th style={{ width: "20px" }}>Action</th>

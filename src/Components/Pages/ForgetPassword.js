@@ -40,7 +40,7 @@ const ForgetPassword = () => {
       style={{ height: "670px", paddingTop: "150px" }}
     >
       <div className="row">
-        <div className="col-md-6 mx-auto mt-5 p-3 text-white text-center ">
+        <div className="col-md-6 mx-auto mt-2 p-3 text-white text-center ">
           <div className="bg-danger bg-gradient p-3 rounded-2 ">
             <h3>Forget Password</h3>
           </div>

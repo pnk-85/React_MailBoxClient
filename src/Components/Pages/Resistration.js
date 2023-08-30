@@ -41,7 +41,7 @@ const Resistration = () => {
             })
             .then((res) => {
                 setIsLogIn(!isLogIn);
-                console.log('user succesfully signed up');
+                
             })
             .catch((error) => {
                 alert(error.response.data.error.message);
@@ -68,7 +68,7 @@ const Resistration = () => {
               }
             )
             .then((res) => {
-              console.log("user has logged in successfully");
+            
               localStorage.setItem("token", res.data.idToken);
               dispatch(authActions.login());
               history.push("/");
@@ -96,7 +96,7 @@ const Resistration = () => {
       style={{ height: "100vh", paddingTop: "100px" }}
     >
       <div className="row">
-        <div className="col-md-6 mx-auto mt-5 p-3  text-white text-center ">
+        <div className="col-md-6 mx-auto mt-2 p-3  text-white text-center ">
           <div
             className={`${
               isLogIn ? "bg-info p-3 rounded-2 " : "bg-warning p-3 rounded-2 "

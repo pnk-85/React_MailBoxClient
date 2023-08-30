@@ -15,7 +15,6 @@ const receivedSlice = createSlice({
       }else {
         state.receivedMails = [...action.payload];
       }
-      console.log('state.receivedMails', state.receivedMails);
     },
     addEmail(state, action) {
       state.receivedMails = [...state.receivedMails, action.payload];

@@ -21,9 +21,7 @@ const Navbar = () => {
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
-          <a className="navbar-brand" href="#">
-            Navbar
-          </a>
+          
           <button className="navbar-toggler" type="button">
             <span className="navbar-toggler-icon"></span>
           </button>
@@ -32,12 +30,6 @@ const Navbar = () => {
               <NavLink className="nav-link " aria-current="page" to="/">
                 Home
               </NavLink>
-              <a className="nav-link" href="#">
-                Features
-              </a>
-              <a className="nav-link" href="#">
-                Pricing
-              </a>
             </div>
             <div>
               {auth && (
