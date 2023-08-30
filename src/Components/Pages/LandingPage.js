@@ -21,6 +21,7 @@ function LandingPage() {
   const items = useSelector((state) => state.received.receivedMails);
   const sent = useSelector(state => state.sent.sentMails);
 
+  const [counter, setCounter] = useState(0);
   const [readMail, setReadMail] = useState([]);
   const [readsentMail, setReadSentMail] = useState([]);
   const [isreadSentMail, setIsReadSentMail] = useState(false);
@@ -31,6 +32,9 @@ function LandingPage() {
   let emailRegEX;
 
   useEffect(() => {
+    setTimeout(() => {
+      setCounter((counter) => counter + 1);
+    }, 2000);
     if (localStorage.getItem('token')) {
       dispatch(authActions.login());
     }
@@ -84,7 +88,7 @@ function LandingPage() {
           }
         });
     }
-  }, [auth]);
+  }, [auth,counter]);
 
   const readSentMailHandler = (item) => {
     setReadSentMail(item);
